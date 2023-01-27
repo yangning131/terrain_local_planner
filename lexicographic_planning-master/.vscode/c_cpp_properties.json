@@ -1,0 +1,20 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/opt/ros/melodic/include/**",
+        "/home/ynp/HybridA_leicographi/src/fitting_planning/include/**",
+        "/home/ynp/HybridA_leicographi/src/jackal_velodyne/include/**",
+        "/home/ynp/HybridA_leicographi/src/kdtree/include/**",
+        "/home/ynp/HybridA_leicographi/src/lexicographic_planning-master/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

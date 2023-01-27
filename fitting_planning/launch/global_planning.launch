@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node pkg="fitting_planning" type="fitting_planning_node" name="fitting_planning_node" output="screen">
+    <!-- <remap from="/path" to="/provider_path"/> -->
+    <remap from = "/path" to = "/planning/planning/execute_path" />
+    <!-- <remap from="/path" to="/planning/server/path_blueprint_smooth"/> -->
+    </node>
+</launch>

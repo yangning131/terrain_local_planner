@@ -1,0 +1,13 @@
+width: 0.25
+length: 0.25
+wheel_radius: 0.1
+#车轮间距
+wheel_spacing: 0.2
+#车轮摩擦系数
+wheel_friction_coeff: 5
+gravitational_acc: 9.8
+max_wheel_speed: 0.2
+max_wheel_acc: 0.5
+max_wheel_dec: 5.0
+max_jerk: 5.0
+is_need_smooth: true

@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/opt/ros/melodic/include/**",
+        "/home/ynp/Wish_ws/src/fitting_planning/include/**",
+        "/home/ynp/Wish_ws/src/Hybrid_A_Star-main/include/**",
+        "/home/ynp/Wish_ws/src/jackal_velodyne/include/**",
+        "/home/ynp/Wish_ws/src/kdtree/include/**",
+        "/home/ynp/Wish_ws/src/lexicographic_planning-master/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
