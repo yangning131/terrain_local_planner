@@ -19,17 +19,17 @@ struct CartesianPlannerConfig {
   /**
    * Number of finite elements used to discretize an OCP
    */
-  int nfe = 320;
+  int nfe = 160;//320
 
   /**
    * Time horizon length (s)
    */
-  double tf = 16;
+  double tf = 8;//16
 
   /**
    * nominal velocity
    */
-  double dp_nominal_velocity = 10.0;
+  double dp_nominal_velocity = 1.5;//10.0
 
   /**
    * cost of obstacles, should be set larger to avoid collision with obstacles
@@ -64,12 +64,12 @@ struct CartesianPlannerConfig {
   /**
    * maximum iteration count for corridor expansion
    */
-  int corridor_max_iter = 1000;
+  int corridor_max_iter = 100;//1000
 
   /**
    * increment limit for corridor expansion
    */
-  double corridor_incremental_limit = 20.0;
+  double corridor_incremental_limit = 10.0;//20
 
   /**
    * Weighting parameter in Eq.(2)

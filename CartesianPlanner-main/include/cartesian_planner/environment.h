@@ -18,6 +18,8 @@
 #include "discretized_trajectory.h"
 #include "vehicle_param.h"
 #include "cartesian_planner_config.h"
+#include <nav_msgs/Path.h>
+#include <nav_msgs/Odometry.h>
 
 namespace cartesian_planner {
 
@@ -39,7 +41,14 @@ public:
     return reference_;
   }
 
+  const nav_msgs::Path &getreference_path() const {
+    return reference_path_;
+  }
+
   void SetReference(const DiscretizedTrajectory &reference);
+  void SetReference(const nav_msgs::Path &reference_path);
+
+
 
   bool CheckCollision(double time, const math::Box2d &rect);
 
@@ -55,6 +64,8 @@ private:
   std::vector<math::Polygon2d> obstacles_;
   DiscretizedTrajectory reference_;
   std::vector<math::Vec2d> road_barrier_;
+  nav_msgs::Path reference_path_;
+
 
   bool CheckStaticCollision(const math::Box2d &rect);
 

@@ -37,6 +37,11 @@ void Environment::SetReference(const DiscretizedTrajectory &reference) {
   });
 }
 
+void Environment::SetReference(const nav_msgs::Path &reference_path) {
+  reference_path_ = reference_path;
+  
+}
+
 bool Environment::CheckStaticCollision(const math::Box2d &rect) {
   for (auto &obstacle: obstacles_) {
     if (obstacle.HasOverlap(rect)) {
@@ -44,31 +49,32 @@ bool Environment::CheckStaticCollision(const math::Box2d &rect) {
     }
   }
 
-  if (road_barrier_.empty()) {
-    return false;
-  }
+  // if (road_barrier_.empty()) {
+  //   return false;
+  // }
 
-  if (rect.max_x() < road_barrier_.front().x() || rect.min_x() > road_barrier_.back().x()) {
-    return false;
-  }
+  // if (rect.max_x() < road_barrier_.front().x() || rect.min_x() > road_barrier_.back().x()) {
+  //   return false;
+  // }
 
   auto comp = [](double val, const Vec2d &a) {
     return val < a.x();
   };
 
   // binary search
-  auto check_start = std::upper_bound(road_barrier_.begin(), road_barrier_.end(), rect.min_x(), comp);
-  auto check_end = std::upper_bound(road_barrier_.begin(), road_barrier_.end(), rect.max_x(), comp);
 
-  if (check_start > road_barrier_.begin()) {
-    std::advance(check_start, -1);
-  }
+  // auto check_start = std::upper_bound(road_barrier_.begin(), road_barrier_.end(), rect.min_x(), comp);
+  // auto check_end = std::upper_bound(road_barrier_.begin(), road_barrier_.end(), rect.max_x(), comp);
 
-  for (auto iter = check_start; iter != check_end; iter++) {
-    if (rect.IsPointIn(*iter)) {
-      return true;
-    }
-  }
+  // if (check_start > road_barrier_.begin()) {
+  //   std::advance(check_start, -1);
+  // }
+
+  // for (auto iter = check_start; iter != check_end; iter++) {
+  //   if (rect.IsPointIn(*iter)) {
+  //     return true;
+  //   }
+  // }
 
   return false;
 }

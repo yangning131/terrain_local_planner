@@ -16,6 +16,14 @@
 #include "dp_planner.h"
 #include "trajectory_optimizer.h"
 
+#include <nav_msgs/Path.h>
+#include <nav_msgs/Odometry.h>
+#include <tf/tf.h>
+#include <tf/LinearMath/Quaternion.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_datatypes.h>
+#include <tf/transform_broadcaster.h>
+
 namespace cartesian_planner {
 
 class CartesianPlanner {
@@ -25,7 +33,7 @@ public:
   };
 
   explicit CartesianPlanner(const CartesianPlannerConfig &config, const Env &env)
-    : config_(config), dp_(config, env), opti_(config, env) {}
+    : config_(config), dp_(config, env), opti_(config, env), env_(env) {}
 
   bool Plan(const StartState &state, DiscretizedTrajectory &result);
 
@@ -34,6 +42,8 @@ private:
   CartesianPlannerConfig config_;
   DpPlanner dp_;
   TrajectoryOptimizer opti_;
+  Env env_;
+
 
 };
 

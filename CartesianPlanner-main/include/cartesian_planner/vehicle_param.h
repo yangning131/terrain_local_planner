@@ -28,7 +28,7 @@ public:
   /**
    * L_W, wheelbase of the ego vehicle (m)
    */
-  double wheel_base = 2.80;
+  double wheel_base = 1.0; //2.8
 
   /**
    * L_R, rear hang length of the ego vehicle (m)
@@ -38,7 +38,7 @@ public:
   /**
    * L_B, width of the ego vehicle (m)
    */
-  double width = 1.942;
+  double width = 1.5; //1.942
 
   /**
    * Upper bound of v(t) (m/s)
@@ -58,7 +58,7 @@ public:
   /**
    * Upper bound of |\phi(t)| (rad)
    */
-  double phi_max = 0.85;
+  double phi_max = 0.43;//.85
 
   /**
    * Upper bound of |\omega(t)| (rad/s)

@@ -1,0 +1,55 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/ynp/Wish_ws/devel/include/**",
+        "/home/ynp/gbplanner_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/aliengo_config/include/**",
+        "/home/ynp/gbplanner_ws/src/A-LOAM-devel/include/**",
+        "/home/ynp/Wish_ws/src/CartesianPlanner-main/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/champ/champ/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/champ/champ_base/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/champ/champ_config/include/**",
+        "/home/ynp/gbplanner_ws/src/Corridor/DecompROS/decomp_ros_utils/include/**",
+        "/home/ynp/gbplanner_ws/src/Corridor/DecompUtil-master/include/**",
+        "/home/ynp/gbplanner_ws/src/src/misc/eigen_checks/include/**",
+        "/home/ynp/Wish_ws/src/fitting_planning/include/**",
+        "/home/ynp/gbplanner_ws/src/src/exploration/gbplanner_ros/gbplanner/include/**",
+        "/home/ynp/Wish_ws/src/jackal_velodyne/include/**",
+        "/home/ynp/gbplanner_ws/src/src/exploration/gbplanner_ros/kdtree/include/**",
+        "/home/ynp/Wish_ws/src/kdtree/include/**",
+        "/home/ynp/Wish_ws/src/lexicographic_planning-master/include/**",
+        "/home/ynp/gbplanner_ws/src/src/sim/lidar_simulator/lidar_gazebo_plugins/include/**",
+        "/home/ynp/gbplanner_ws/src/src/misc/mav_comm/mav_msgs/include/**",
+        "/home/ynp/gbplanner_ws/src/src/misc/mav_comm/mav_planning_msgs/include/**",
+        "/home/ynp/gbplanner_ws/src/src/misc/minkindr/minkindr/include/**",
+        "/home/ynp/gbplanner_ws/src/src/misc/minkindr_ros/minkindr_conversions/include/**",
+        "/home/ynp/gbplanner_ws/src/src/mapping/volumetric_mapping/octomap_world/include/**",
+        "/home/ynp/gbplanner_ws/src/src/exploration/pci_mav/include/**",
+        "/home/ynp/gbplanner_ws/src/src/exploration/gbplanner_ros/planner_control_interface/include/**",
+        "/home/ynp/gbplanner_ws/src/car/pointcloud_to_laserscan/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/realsense_ros_gazebo/include/**",
+        "/home/ynp/gbplanner_ws/src/src/sim/rotors_simulator/rotors_control/include/**",
+        "/home/ynp/gbplanner_ws/src/src/sim/rotors_simulator/rotors_gazebo_plugins/include/**",
+        "/home/ynp/gbplanner_ws/src/src/sim/rotors_simulator/rotors_joy_interface/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/unitree_ros/unitree_controller/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/unitree_ros/unitree_legged_control/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/unitree_ros/unitree_legged_real/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/velodyne_simulator/velodyne_gazebo_plugins/include/**",
+        "/home/ynp/gbplanner_ws/src/src/mapping/volumetric_mapping/volumetric_map_base/include/**",
+        "/home/ynp/gbplanner_ws/src/src/mapping/voxblox/voxblox/include/**",
+        "/home/ynp/gbplanner_ws/src/src/mapping/voxblox/voxblox_ros/include/**",
+        "/home/ynp/gbplanner_ws/src/src/mapping/voxblox/voxblox_rviz_plugin/include/**",
+        "/home/ynp/gbplanner_ws/src/dog/yocs_velocity_smoother/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

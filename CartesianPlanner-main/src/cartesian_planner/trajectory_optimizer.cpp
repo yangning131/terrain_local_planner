@@ -31,7 +31,10 @@ bool TrajectoryOptimizer::OptimizeIteratively(const DiscretizedTrajectory &coars
     guess.y.push_back(pt.y);
     guess.theta.push_back(pt.theta);
   }
+        std::cout<<"44444444444444444444444444444444"<<std::endl;
+
   CalculateInitialGuess(guess);
+        std::cout<<"555555555555555555555555555"<<std::endl;
 
   int iter = 0;
   double w_penalty = config_.opti_w_penalty0;

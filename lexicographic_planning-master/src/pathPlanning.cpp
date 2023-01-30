@@ -205,7 +205,6 @@ class PathPlanning : public ParamServer
 
         /* Hybrid */
 
-
         ImageMap.release();
         ImageMap = cv::Mat::zeros(400, 400, CV_8UC1);
 
@@ -401,9 +400,6 @@ bool AnalyticExpansions(const StateNode::Ptr &current_node_ptr,
             return false;
         }
        
-        
-      
-
     }
 
     goal_node_ptr->intermediate_states_ = rs_path_poses;
@@ -527,9 +523,12 @@ void GetNeighborNodes(const StateNode::Ptr &curr_node_ptr,
         }/*sideward*/
     }
     else
-    {
-
+    {   
+        std::cout<<"farward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;       
+        if(use_backwardmodel)
+        {
         // backward
+        std::cout<<"backward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
         has_obstacle = false;
         intermediate_state.clear();
         x = curr_node_ptr->state_.x();
@@ -556,6 +555,7 @@ void GetNeighborNodes(const StateNode::Ptr &curr_node_ptr,
             neighbor_backward_node_ptr->direction_ = StateNode::BACKWARD;
             neighbor_nodes.push_back(neighbor_backward_node_ptr);
            
+        }
         }
        
     }
@@ -746,7 +746,7 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
                     path_length_ = path_length_ + segment_length_;
                 }
                 path_length_ = path_length_ - segment_length_ + rs_length;
-
+                
                 // std::cout << "ComputeH use time(ms): " << compute_h_time << std::endl;
                 // std::cout << "check collision use time(ms): " << check_collision_use_time << std::endl;
                 // std::cout << "GetNeighborNodes use time(ms): " << neighbor_time << std::endl;
@@ -760,6 +760,23 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
                 num_check_collision = 0.0;
                 return true;
             }
+        }
+        if(!use_rspath)
+        {
+            if((current_node_ptr->state_.head(2) - goal_node_ptr->state_.head(2)).norm() <= 0.5 && std::abs(current_node_ptr->state_[2]-goal_node_ptr->state_[2])<=0.3)
+            {   
+                goal_node_ptr->parent_node_ = current_node_ptr;
+                terminal_node_ptr_ = goal_node_ptr;
+                StateNode::Ptr grid_node_ptr = terminal_node_ptr_->parent_node_;
+                while (grid_node_ptr != nullptr) {
+                    grid_node_ptr = grid_node_ptr->parent_node_;
+                    path_length_ = path_length_ + segment_length_;
+                }
+                path_length_ = path_length_ - segment_length_;
+                return true;
+
+            }
+                
         }
         // else{
         //         if(isInRange(current_node_ptr->state_,goal_node_ptr->state_))

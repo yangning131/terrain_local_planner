@@ -144,6 +144,8 @@ public:
 
     bool use_rspath;
     bool use_sidemodel;
+    bool use_backwardmodel;
+
     
     ParamServer()
     {
@@ -171,6 +173,8 @@ public:
 
         nh.param<bool>("roboat_planning/_is_use_rspath",       use_rspath,     false);
         nh.param<bool>("roboat_planning/_is_use_sidemodel",    use_sidemodel,  false);
+        nh.param<bool>("roboat_planning/_use_backwardmodel",    use_backwardmodel,  false);
+
 
         _rollOutCenter = _rollOutNumber / 2;
         if (_maxPathDistance < _sensorRangeLimitMax * 2.0)

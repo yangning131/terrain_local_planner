@@ -15,11 +15,119 @@
 namespace cartesian_planner {
 
 bool CartesianPlanner::Plan(const StartState &state, DiscretizedTrajectory &result) {
-  DiscretizedTrajectory coarse_trajectory;
-  if(!dp_.Plan(state.x, state.y, state.theta, coarse_trajectory)) {
-    ROS_ERROR("DP failed");
+  std::vector<TrajectoryPoint> points;
+
+  // DiscretizedTrajectory coarse_trajectory;
+  // if(!dp_.Plan(state.x, state.y, state.theta, coarse_trajectory)) {
+  //   ROS_ERROR("DP failed");
+  //   return false;
+  // }
+
+  nav_msgs::Path reference_path;
+  reference_path = env_->getreference_path();
+
+  if(reference_path.poses.empty()) {
+    ROS_ERROR("reference_path empty");
     return false;
   }
+
+  //max_15m
+  int num = config_.nfe;
+  double length_max = 15.0 ;
+  double lenth = 0.0;
+  int end_index = reference_path.poses.size()-1;
+  for(int i = 1 ;i<= end_index ;++i)
+  {
+    lenth +=  hypot(reference_path.poses[i].pose.position.x - reference_path.poses[i-1].pose.position.x, reference_path.poses[i].pose.position.y - reference_path.poses[i-1].pose.position.y);
+    if(lenth>=length_max)
+    {
+        end_index = i;
+        break;
+    }
+  }
+
+        double pathResolution = lenth < length_max ?(lenth/num):(length_max/num);
+        double dis = 0, ang = 0;
+        double margin = pathResolution * 0.01;
+        double remaining = 0;
+        int nPoints = 0;
+        nav_msgs::Path fixedPath = reference_path;
+        fixedPath.poses.clear();
+        fixedPath.poses.push_back(reference_path.poses[0]);
+        size_t start = 0, next = 1;
+
+        while (next <=end_index)
+        {
+            dis += hypot(reference_path.poses[next].pose.position.x - reference_path.poses[next-1].pose.position.x, reference_path.poses[next].pose.position.y - reference_path.poses[next-1].pose.position.y) + remaining;
+            ang = atan2(reference_path.poses[next].pose.position.y - reference_path.poses[start].pose.position.y, reference_path.poses[next].pose.position.x - reference_path.poses[start].pose.position.x);
+
+            if (dis < pathResolution - margin)
+            {
+                next++;
+                remaining = 0;
+            } else if (dis > (pathResolution + margin))
+            {
+                geometry_msgs::PoseStamped point_start = reference_path.poses[start];
+                nPoints = dis / pathResolution;
+                for (int j = 0; j < nPoints; j++)
+                {
+                    point_start.pose.position.x = point_start.pose.position.x + pathResolution * cos(ang);
+                    point_start.pose.position.y = point_start.pose.position.y + pathResolution * sin(ang);
+                    point_start.pose.orientation = tf::createQuaternionMsgFromYaw(ang);
+                    fixedPath.poses.push_back(point_start);
+                }
+                remaining = dis - nPoints * pathResolution;
+                start++;
+                reference_path.poses[start].pose.position = point_start.pose.position;
+                dis = 0;
+                next++;
+            } else {
+                dis = 0;
+                remaining = 0;
+                fixedPath.poses.push_back(reference_path.poses[next]);
+                next++;
+                start = next - 1;
+            }
+        }
+
+        if(fixedPath.poses.size()>num)
+        {
+          fixedPath.poses.erase(fixedPath.poses.begin()+num, fixedPath.poses.end());
+        }
+        else if(fixedPath.poses.size()<num)
+        {
+            int n = num - fixedPath.poses.size();
+            geometry_msgs::PoseStamped point_add = fixedPath.poses[fixedPath.poses.size()-1];
+            while (n>0)
+            {
+              fixedPath.poses.push_back(point_add);
+              n--;
+            }
+            
+        }
+
+
+  
+
+  //等距分割
+  if(fixedPath.poses.size()!=num)
+  {
+    std::cout<<"fixedPath.poses.size()!=num"<<fixedPath.poses.size()<<std::endl;
+    return false;
+  }
+
+  // config_.nfe
+
+  TrajectoryPoint point;
+  for(int i=0;i<fixedPath.poses.size();++i)
+  {
+    point.x = fixedPath.poses[i].pose.position.x;
+    point.y = fixedPath.poses[i].pose.position.y;
+    point.theta = tf::getYaw(fixedPath.poses[i].pose.orientation);
+    points.emplace_back(point);
+  }
+  DiscretizedTrajectory coarse_trajectory(points);
+
 
   Constraints opti_constraints;
   opti_constraints.start_x = state.x; opti_constraints.start_y = state.y; opti_constraints.start_theta = state.theta;

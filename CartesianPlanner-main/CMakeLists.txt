@@ -7,6 +7,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   message_generation
   geometry_msgs
+  nav_msgs
+  nav_core
+  tf
 )
 
 add_message_files(
@@ -24,7 +27,7 @@ generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES cartesian_planner
-  CATKIN_DEPENDS roscpp message_runtime
+  CATKIN_DEPENDS roscpp message_runtime nav_msgs nav_core
 )
 
 include_directories(
