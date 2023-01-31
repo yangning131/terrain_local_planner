@@ -20,6 +20,8 @@
 #include "cartesian_planner_config.h"
 #include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/OccupancyGrid.h>
+
 
 namespace cartesian_planner {
 
@@ -45,8 +47,14 @@ public:
     return reference_path_;
   }
 
+  const nav_msgs::OccupancyGrid &getObstacle_map() const {
+    return obstacles_map_;
+  }
+
   void SetReference(const DiscretizedTrajectory &reference);
   void SetReference(const nav_msgs::Path &reference_path);
+  void SetObstacles_map(const nav_msgs::OccupancyGrid &obstacles_map);
+
 
 
 
@@ -65,6 +73,7 @@ private:
   DiscretizedTrajectory reference_;
   std::vector<math::Vec2d> road_barrier_;
   nav_msgs::Path reference_path_;
+  nav_msgs::OccupancyGrid obstacles_map_;
 
 
   bool CheckStaticCollision(const math::Box2d &rect);

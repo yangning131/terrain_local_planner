@@ -18,6 +18,7 @@
 
 #include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/OccupancyGrid.h>
 #include <tf/tf.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/transform_listener.h>
@@ -33,14 +34,13 @@ public:
   };
 
   explicit CartesianPlanner(const CartesianPlannerConfig &config, const Env &env)
-    : config_(config), dp_(config, env), opti_(config, env), env_(env) {}
+    : config_(config), opti_(config, env), env_(env) {}
 
   bool Plan(const StartState &state, DiscretizedTrajectory &result);
 
 
 private:
   CartesianPlannerConfig config_;
-  DpPlanner dp_;
   TrajectoryOptimizer opti_;
   Env env_;
 

@@ -64,12 +64,12 @@ struct CartesianPlannerConfig {
   /**
    * maximum iteration count for corridor expansion
    */
-  int corridor_max_iter = 100;//1000
+  int corridor_max_iter = 50;//1000
 
   /**
    * increment limit for corridor expansion
    */
-  double corridor_incremental_limit = 10.0;//20
+  double corridor_incremental_limit = 10.0;//20  10.0
 
   /**
    * Weighting parameter in Eq.(2)

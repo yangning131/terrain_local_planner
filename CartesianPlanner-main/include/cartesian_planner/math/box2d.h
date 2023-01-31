@@ -25,6 +25,8 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <unordered_map>
+
 
 #include "aabox2d.h"
 #include "line_segment2d.h"
@@ -256,6 +258,13 @@ public:
   double min_x() const { return min_x_; }
   double max_y() const { return max_y_; }
   double min_y() const { return min_y_; }
+
+      
+  std::tuple<double, double, double, double> Getboxposition() const
+  { 
+    return std::make_tuple(max_x_, min_x_, max_y_, min_y_);
+  }
+
 
 private:
   Vec2d center_;

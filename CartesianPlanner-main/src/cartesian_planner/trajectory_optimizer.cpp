@@ -31,10 +31,8 @@ bool TrajectoryOptimizer::OptimizeIteratively(const DiscretizedTrajectory &coars
     guess.y.push_back(pt.y);
     guess.theta.push_back(pt.theta);
   }
-        std::cout<<"44444444444444444444444444444444"<<std::endl;
 
   CalculateInitialGuess(guess);
-        std::cout<<"555555555555555555555555555"<<std::endl;
 
   int iter = 0;
   double w_penalty = config_.opti_w_penalty0;
@@ -131,7 +129,7 @@ bool TrajectoryOptimizer::FormulateCorridorConstraints(States &states, Constrain
 bool TrajectoryOptimizer::GenerateBox(double time, double &x, double &y, double radius, AABox2d &result) const {
   double ri = radius;
   AABox2d bound({-ri, -ri}, {ri, ri});
-  if (CheckCollision(time, x, y, bound)) {
+  if (CheckCollision(time, x, y, bound)) { //有碰撞返回true
     // initial condition not satisfied, involute to find feasible box
     int inc = 4;
     double real_x, real_y;
@@ -190,6 +188,7 @@ bool TrajectoryOptimizer::GenerateBox(double time, double &x, double &y, double 
 
   result = {{x - incremental[0], y - incremental[2]},
             {x + incremental[1], y + incremental[3]}};
+
   return true;
 }
 }

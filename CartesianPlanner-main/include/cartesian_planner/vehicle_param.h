@@ -23,22 +23,22 @@ public:
   /**
    * L_F, front hang length of the ego vehicle (m)
    */
-  double front_hang_length = 0.96;
+  double front_hang_length = 0.3;//0.96
 
   /**
    * L_W, wheelbase of the ego vehicle (m)
    */
-  double wheel_base = 1.0; //2.8
+  double wheel_base = 0.7; //2.8
 
   /**
    * L_R, rear hang length of the ego vehicle (m)
    */
-  double rear_hang_length = 0.929;
+  double rear_hang_length = 0.3;//0.929
 
   /**
    * L_B, width of the ego vehicle (m)
    */
-  double width = 1.5; //1.942
+  double width = 1.4; //1.942
 
   /**
    * Upper bound of v(t) (m/s)

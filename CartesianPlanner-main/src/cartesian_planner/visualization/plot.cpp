@@ -44,7 +44,7 @@ Plot(const Vector &xs, const Vector &ys, double width, Color color, int id, cons
     geometry_msgs::Point pt;
     pt.x = xs[i];
     pt.y = ys[i];
-    pt.z = 0.1 * id;
+    pt.z = 0.1;
     msg.points.push_back(pt);
   }
 

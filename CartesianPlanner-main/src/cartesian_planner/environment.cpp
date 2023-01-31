@@ -41,13 +41,102 @@ void Environment::SetReference(const nav_msgs::Path &reference_path) {
   reference_path_ = reference_path;
   
 }
+void Environment::SetObstacles_map(const nav_msgs::OccupancyGrid &obstacles_map)
+{ 
+  obstacles_map_ = obstacles_map;
+}
 
+//对象是const 里面的函数也应该是const修饰
 bool Environment::CheckStaticCollision(const math::Box2d &rect) {
-  for (auto &obstacle: obstacles_) {
-    if (obstacle.HasOverlap(rect)) {
-      return true;
-    }
+  // double xmax, ymax, xmin, ymin;
+  double xmax = rect.max_x();
+  double ymax = rect.max_y();
+  double xmin = rect.min_x();
+  double ymin = rect.min_y();
+  // std::tie(xmax, xmin, ymax, ymin) = rect.Getboxposition();
+
+  // for(double x = xmin ;x<=xmax ; x+=getObstacle_map().info.resolution) 
+  // {     
+  //       int index_x = (int)round((x - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+  //       int index_y_max = (int)round((ymax - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+  //       int index_y_min = (int)round((ymin - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+  //       int index_0 = index_x + index_y_min * getObstacle_map().info.width;
+  //       int index_1 = index_x + index_y_max * getObstacle_map().info.width;
+  //       if (index_x < 0 || index_x >= getObstacle_map().info.width || index_y_min < 0 || index_y_min >= getObstacle_map().info.height||
+  //           index_y_max < 0 || index_y_max >= getObstacle_map().info.height)    
+  //           return true;
+  //       if (getObstacle_map().data[index_0] != 0||getObstacle_map().data[index_1] != 0)
+  //           return true;
+  // }
+
+  // for(double y = ymin ;y<=ymax ; y+=getObstacle_map().info.resolution)
+  // {
+  //       int index_x_min = (int)round((xmin - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+  //       int index_x_max = (int)round((xmax - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+  //       int index_y = (int)round((y - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+  //       int index_0 = index_x_min + index_y * getObstacle_map().info.width;
+  //       int index_1 = index_x_max + index_y * getObstacle_map().info.width;
+  //       if (index_x_min < 0 || index_x_min >= getObstacle_map().info.width || index_x_max < 0 || index_x_max >= getObstacle_map().info.width||
+  //           index_y < 0 || index_y >= getObstacle_map().info.height)
+  //           return true;
+  //       if (getObstacle_map().data[index_0] != 0||getObstacle_map().data[index_1] != 0)
+  //           return true;
+  // }
+  //8989998
+  for(double x = xmin ;x<=xmax ; x+=getObstacle_map().info.resolution) 
+  {     
+        int index_x = (int)round((x - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+        int index_y_min = (int)round((ymin - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+        int index_0 = index_x + index_y_min * getObstacle_map().info.width;
+        if (index_x < 0 || index_x >= getObstacle_map().info.width || index_y_min < 0 || index_y_min >= getObstacle_map().info.height)    
+             continue;
+        if (getObstacle_map().data[index_0] != 0)
+            return true;
   }
+
+  for(double y = ymin ;y<=ymax ; y+=getObstacle_map().info.resolution)
+  {
+        int index_x_min = (int)round((xmin - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+        int index_y = (int)round((y - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+        int index_0 = index_x_min + index_y * getObstacle_map().info.width;
+        if (index_x_min < 0 || index_x_min >= getObstacle_map().info.width || 
+            index_y < 0 || index_y >= getObstacle_map().info.height)
+            continue;
+        if (getObstacle_map().data[index_0] != 0)
+            return true;
+  }
+  for(double x = xmin ;x<=xmax ; x+=getObstacle_map().info.resolution) 
+  {     
+        int index_x = (int)round((x - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+        int index_y_max = (int)round((ymax - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+        int index_1 = index_x + index_y_max * getObstacle_map().info.width;
+        if (index_x < 0 || index_x >= getObstacle_map().info.width ||
+            index_y_max < 0 || index_y_max >= getObstacle_map().info.height)    
+            continue;
+        if (getObstacle_map().data[index_1] != 0)
+            return true;
+  }
+
+  for(double y = ymin ;y<=ymax ; y+=getObstacle_map().info.resolution)
+  {
+        int index_x_max = (int)round((xmax - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+        int index_y = (int)round((y - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+        int index_1 = index_x_max + index_y * getObstacle_map().info.width;
+        if ( index_x_max < 0 || index_x_max >= getObstacle_map().info.width||
+            index_y < 0 || index_y >= getObstacle_map().info.height)
+            continue;
+        if (getObstacle_map().data[index_1] != 0)
+            return true;
+  }
+
+
+  return false;
+}
+  // for (auto &obstacle: obstacles_) {
+  //   if (obstacle.HasOverlap(rect)) {
+  //     return true;
+  //   }
+  // }
 
   // if (road_barrier_.empty()) {
   //   return false;
@@ -57,9 +146,9 @@ bool Environment::CheckStaticCollision(const math::Box2d &rect) {
   //   return false;
   // }
 
-  auto comp = [](double val, const Vec2d &a) {
-    return val < a.x();
-  };
+  // auto comp = [](double val, const Vec2d &a) {
+  //   return val < a.x();
+  // };
 
   // binary search
 
@@ -75,9 +164,6 @@ bool Environment::CheckStaticCollision(const math::Box2d &rect) {
   //     return true;
   //   }
   // }
-
-  return false;
-}
 
 bool Environment::CheckCollision(double time, const math::Box2d &rect) {
   if (CheckDynamicCollision(time, rect)) {

@@ -17,12 +17,6 @@ namespace cartesian_planner {
 bool CartesianPlanner::Plan(const StartState &state, DiscretizedTrajectory &result) {
   std::vector<TrajectoryPoint> points;
 
-  // DiscretizedTrajectory coarse_trajectory;
-  // if(!dp_.Plan(state.x, state.y, state.theta, coarse_trajectory)) {
-  //   ROS_ERROR("DP failed");
-  //   return false;
-  // }
-
   nav_msgs::Path reference_path;
   reference_path = env_->getreference_path();
 
