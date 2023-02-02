@@ -43,7 +43,7 @@ bool TrajectoryOptimizer::OptimizeIteratively(const DiscretizedTrajectory &coars
     FormulateCorridorConstraints(guess, iterative_constraints);
 
     double cur_infeasibility = nlp_.SolveIteratively(w_penalty, iterative_constraints, guess, coarse, guess);
-    visualization::Plot(guess.x, guess.y, 0.1, visualization::Color::Red, iter, "Intermediate Trajectory");
+    visualization::Plot(guess.x, guess.y, 0.1, visualization::Color::Green, iter, "Intermediate Trajectory");
     visualization::Trigger();
 
     ROS_INFO("iter = %d, cur_infeasibility = %f, w_penalty = %f", iter, cur_infeasibility, w_penalty);

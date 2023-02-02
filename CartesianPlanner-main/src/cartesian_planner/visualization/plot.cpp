@@ -72,6 +72,7 @@ void Plot(const Vector &xs, const Vector &ys, double width,
     geometry_msgs::Point pt;
     pt.x = xs[i];
     pt.y = ys[i];
+    pt.z = 0.2;
     msg.points.push_back(pt);
     msg.colors.push_back(color[i].toColorRGBA());
   }

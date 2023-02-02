@@ -31,6 +31,7 @@ class PathPlanning : public ParamServer
 
     std::mutex mtx;
     ros::Timer pathUpdateTimer;
+    ros::Timer pathPublishTimer;
 
     ros::Subscriber subGlobalPath;
     ros::Subscriber subObstacleMap;
@@ -172,7 +173,7 @@ class PathPlanning : public ParamServer
 
         pub_delete_openplanner = nh.advertise<visualization_msgs::MarkerArray>("planning/planning/open_planner", 5);
 
-        pubExecutePath = nh.advertise<nav_msgs::Path>("planning/planning/execute_path11", 1);
+        pubExecutePath = nh.advertise<nav_msgs::Path>("planning/planning/execute_path222", 1);
         pubSearchedPath = nh.advertise<nav_msgs::Path>("planning/planning/searched_path", 1);
 
         pubImage_robot  = nh.advertise<sensor_msgs::Image>("planning/obstacle/Imagerobot", 1);
@@ -221,6 +222,8 @@ class PathPlanning : public ParamServer
         adjacency_length_grid = -1;
 
         pathUpdateTimer = nh.createTimer(ros::Duration(3.0/1.0), &PathPlanning::updatePath, this);
+        // pathPublishTimer = nh.createTimer(ros::Duration(0.05), &PathPlanning::publishPath, this);
+
 
     }
 
@@ -619,7 +622,7 @@ VectorVec3d GetPath() const {
     return path;
 }
 
-void Publish_KinoPath(const VectorVec3d &path) {
+void save_KinoPath(const VectorVec3d &path) {
     nav_msgs::Path nav_path;
 
     geometry_msgs::PoseStamped pose_stamped;
@@ -627,7 +630,7 @@ void Publish_KinoPath(const VectorVec3d &path) {
         pose_stamped.header.frame_id = "map";
         pose_stamped.pose.position.x = pose.x();
         pose_stamped.pose.position.y = pose.y();
-        pose_stamped.pose.position.z = 0.0;
+        pose_stamped.pose.position.z = 0.15;
         pose_stamped.pose.orientation = tf::createQuaternionMsgFromYaw(pose.z());
 
         nav_path.poses.emplace_back(pose_stamped);
@@ -635,10 +638,9 @@ void Publish_KinoPath(const VectorVec3d &path) {
 
     nav_path.header.frame_id = "map";
     nav_path.header.stamp = ros::Time::now();
-
     executePath = nav_path;
 
-    path_pub_.publish(nav_path);
+     path_pub_.publish(nav_path);
 }
 
 void Publish_imageshow(const VectorVec3d &path) {
@@ -2060,8 +2062,12 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
         return true;
     }
 
-    void publishPath()
-    {
+    void publishPath(const ros::TimerEvent& event)
+    {   
+        std::lock_guard<std::mutex> lock(mtx);
+        executePath.header.frame_id = "map";
+        executePath.header.stamp = ros::Time::now();
+
         int size = executePath.poses.size();
         if (size <= 2)
         {
@@ -2209,7 +2215,7 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
             {
                 ROS_INFO("re-plannig success!");
                 auto path = GetPath();
-                Publish_KinoPath(path);
+                save_KinoPath(path);
 
                 Publish_imageshow(path);
             }
@@ -2220,7 +2226,7 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
         }
        // visualization();
 
-        publishPath();
+        // publishPath();
     }
 };
 

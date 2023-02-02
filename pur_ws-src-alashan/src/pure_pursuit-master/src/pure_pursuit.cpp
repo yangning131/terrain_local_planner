@@ -367,7 +367,7 @@ void PurePursuit::run()
 
 void PurePursuit::reconfigure(pure_pursuit::PurePursuitConfig &config, uint32_t level)
 {
-   v_max_ = 0.7;
+   v_max_ = 0.9;
   // v_max_ = 1.0;
 }
 

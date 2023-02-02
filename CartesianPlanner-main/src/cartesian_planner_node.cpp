@@ -32,6 +32,10 @@ public:
   tf::TransformListener listener;
   tf::StampedTransform transform;
   bool receive = false;
+  ros::Timer pathUpdateTimer;
+  ros::Publisher path_pub_;
+
+
 
   explicit CartesianPlannerNode(const ros::NodeHandle &nh) : nh_(nh) {
     env_ = std::make_shared<Environment>(config_);
@@ -41,19 +45,23 @@ public:
     dynamic_obstacles_subscriber_ = nh_.subscribe("/dynamic_obstacles", 1,
                                                   &CartesianPlannerNode::DynamicObstaclesCallback, this);//每个时间点对应障碍物的坐标
 
-    or_path_subscriber_ = nh_.subscribe("planning/server/path_blueprint_smooth", 1, &CartesianPlannerNode::Pathcallback, this); //planning/planning/execute_path  planning/server/path_blueprint_smooth
+    or_path_subscriber_ = nh_.subscribe("planning/planning/execute_path", 1, &CartesianPlannerNode::Pathcallback, this); //planning/planning/execute_path  planning/server/path_blueprint_smooth
     subObstacleMap_ = nh_.subscribe<nav_msgs::OccupancyGrid>("planning/obstacle/map_inflated", 5, &CartesianPlannerNode::mapHandler, this);
 
+    pathUpdateTimer = nh_.createTimer(ros::Duration(0.2), &CartesianPlannerNode::updatePath, this);
+    path_pub_ = nh_.advertise<nav_msgs::Path>("planning/planning/execute_path_op", 1);
 
 
-    state_.x = 0.0;
-    state_.y = 0.0;
-    state_.theta = 0.0;
-    state_.v = 0.0;
-    state_.phi = 0.0;
-    state_.a = 0.0;
-    state_.omega = 0.0;
+    // state_.x = 0.0;
+    // state_.y = 0.0;
+    // state_.theta = 0.0;
+    // state_.v = 0.0;
+    // state_.phi = 0.0;
+    // state_.a = 0.0;
+    // state_.omega = 0.0;
   }
+
+
 
   
   inline float NormalizeAngle_pi(const float angle) const
@@ -74,13 +82,19 @@ public:
         try{listener.lookupTransform("map","base_link", ros::Time(0), transform); } 
         catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom Failure.");*/ return false; }
         
-        robotstate.x = transform.getOrigin().x();
-        robotstate.y = transform.getOrigin().y();
+        state_.x = transform.getOrigin().x();
+        state_.y = transform.getOrigin().y();
 
         double roll, pitch, yaw;
         tf::Matrix3x3 m(transform.getRotation());
         m.getRPY(roll, pitch, yaw);
-        robotstate.theta = NormalizeAngle_pi(yaw);
+        state_.theta = NormalizeAngle_pi(yaw);
+
+
+    state_.v = 0.3;
+    state_.phi = 0.0;
+    state_.a = 0.0;
+    state_.omega = 0.0;
 
         return true;
   }
@@ -171,31 +185,55 @@ double cast_from_0_to_2PI_Angle(const double& ang)
       globalPathMessage = *pathMsg;
       env_->SetReference(globalPathMessage);
       receive = true;
+  }
 
-    DiscretizedTrajectory result;
+  void updatePath(const ros::TimerEvent& event)
+  {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    if (getRobotPosition() == false) return;
+
+      DiscretizedTrajectory result;
     if(receive)
     {
     if (planner_->Plan(state_, result)) {
-      double dt = config_.tf / (double) (config_.nfe - 1);
+        nav_msgs::Path nav_path;
+        geometry_msgs::PoseStamped pose_stamped;
+        pose_stamped.header.frame_id = "map";
+
       for (int i = 0; i < config_.nfe; i++) {
-        double time = dt * i;
-        auto dynamic_obstacles = env_->QueryDynamicObstacles(time);
-        for (auto &obstacle: dynamic_obstacles) {
-          int hue = int((double) obstacle.first / env_->dynamic_obstacles().size() * 320);
-
-          visualization::PlotPolygon(obstacle.second, 0.2, visualization::Color::fromHSV(hue, 1.0, 1.0), obstacle.first,
-                                     "Online Obstacle");
-        }
-
         auto &pt = result.data().at(i);
-        PlotVehicle(1, {pt.x, pt.y, pt.theta}, atan(pt.kappa * config_.vehicle.wheel_base));
-        ros::Duration(dt).sleep();
-      }
+        pose_stamped.pose.position.x = pt.x;
+        pose_stamped.pose.position.y = pt.y;
+        pose_stamped.pose.position.z = 0.2;
+        pose_stamped.pose.orientation = tf::createQuaternionMsgFromYaw(pt.theta);
 
-      visualization::Trigger();
+        nav_path.poses.emplace_back(pose_stamped);
+      }
+      nav_path.header.frame_id = "map";
+      nav_path.header.stamp = ros::Time::now();
+      path_pub_.publish(nav_path);
+      // double dt = config_.tf / (double) (config_.nfe - 1);
+      // for (int i = 0; i < config_.nfe; i++) {
+      //   double time = dt * i;
+      //   auto dynamic_obstacles = env_->QueryDynamicObstacles(time);
+      //   for (auto &obstacle: dynamic_obstacles) {
+      //     int hue = int((double) obstacle.first / env_->dynamic_obstacles().size() * 320);
+
+      //     visualization::PlotPolygon(obstacle.second, 0.2, visualization::Color::fromHSV(hue, 1.0, 1.0), obstacle.first,
+      //                                "Online Obstacle");
+      //   }
+
+      //   auto &pt = result.data().at(i);
+      //   PlotVehicle(1, {pt.x, pt.y, pt.theta}, atan(pt.kappa * config_.vehicle.wheel_base));
+      //   ros::Duration(dt).sleep();
+      // }
+
+      // visualization::Trigger();
     }
     }
-    receive = false;
+
+
   }
 
 private:

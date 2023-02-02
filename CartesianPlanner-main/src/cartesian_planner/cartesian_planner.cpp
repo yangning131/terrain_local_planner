@@ -20,6 +20,31 @@ bool CartesianPlanner::Plan(const StartState &state, DiscretizedTrajectory &resu
   nav_msgs::Path reference_path;
   reference_path = env_->getreference_path();
 
+  int min_id = -1;
+  float min_dist = FLT_MAX;
+
+  TrajectoryPoint robotPoint;
+  robotPoint.x =  state.x;
+  robotPoint.y =  state.y;
+  for (int i = 0; i < reference_path.poses.size(); ++i)
+  {
+      TrajectoryPoint p;
+
+      p.x = reference_path.poses[i].pose.position.x;
+      p.y = reference_path.poses[i].pose.position.y;
+      // p.z = robotPoint.z;
+
+      float dist = pointDistance(p, robotPoint);
+      if (dist < min_dist)
+      {
+          min_dist = dist;
+          min_id = i;
+      }
+  }
+
+  if (min_id >= 0 && min_dist < 1.0)
+      reference_path.poses.erase(reference_path.poses.begin(), reference_path.poses.begin() + min_id);
+  
   if(reference_path.poses.empty()) {
     ROS_ERROR("reference_path empty");
     return false;
@@ -164,7 +189,7 @@ bool CartesianPlanner::Plan(const StartState &state, DiscretizedTrajectory &resu
     result_data.push_back(tp);
   }
 
-  visualization::PlotTrajectory(opti_x, opti_y, opti_v, config_.vehicle.max_velocity, 0.1, visualization::Color::Green, 1, "Optimized Trajectory");
+  visualization::PlotTrajectory(opti_x, opti_y, opti_v, config_.vehicle.max_velocity, 0.1, visualization::Color::Black, 1, "Optimized Trajectory");
   visualization::Trigger();
 
   result = DiscretizedTrajectory(result_data);

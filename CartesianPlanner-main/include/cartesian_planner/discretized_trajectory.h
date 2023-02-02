@@ -62,6 +62,7 @@ public:
   Vec2d GetCartesian(double station, double lateral) const;
 
 
+
 protected:
   std::vector<TrajectoryPoint> data_;
 };

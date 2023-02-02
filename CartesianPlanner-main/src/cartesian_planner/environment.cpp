@@ -49,10 +49,10 @@ void Environment::SetObstacles_map(const nav_msgs::OccupancyGrid &obstacles_map)
 //对象是const 里面的函数也应该是const修饰
 bool Environment::CheckStaticCollision(const math::Box2d &rect) {
   // double xmax, ymax, xmin, ymin;
-  double xmax = rect.max_x();
-  double ymax = rect.max_y();
-  double xmin = rect.min_x();
-  double ymin = rect.min_y();
+  double xmax = rect.center_x() + rect.half_length();
+  double ymax = rect.center_y() + rect.half_width();
+  double xmin = rect.center_x() - rect.half_length();
+  double ymin = rect.center_y() - rect.half_width();
   // std::tie(xmax, xmin, ymax, ymin) = rect.Getboxposition();
 
   // for(double x = xmin ;x<=xmax ; x+=getObstacle_map().info.resolution) 
@@ -83,6 +83,8 @@ bool Environment::CheckStaticCollision(const math::Box2d &rect) {
   //           return true;
   // }
   //8989998
+  // if(xmax-xmin>10.0)
+  // std::cout<<"QWQWQWQWQWQ  "<<xmax-xmin<<"DDSDSDSDSDS  "<<ymax-ymin<<std::endl;
   for(double x = xmin ;x<=xmax ; x+=getObstacle_map().info.resolution) 
   {     
         int index_x = (int)round((x - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
@@ -128,6 +130,36 @@ bool Environment::CheckStaticCollision(const math::Box2d &rect) {
         if (getObstacle_map().data[index_1] != 0)
             return true;
   }
+// std::cout<<"getObstacle_map().info.resolution"<<getObstacle_map().info.resolution<<std::endl;
+// for(double x = xmin ;x<=xmax ; x+=getObstacle_map().info.resolution)
+// {
+//     for(double y = ymin ;y<=ymax ; y+=getObstacle_map().info.resolution)
+//   {
+//         int index_x_max = (int)round((x - getObstacle_map().info.origin.position.x) / getObstacle_map().info.resolution);
+//         int index_y = (int)round((y - getObstacle_map().info.origin.position.y) / getObstacle_map().info.resolution);
+//         int index_1 = index_x_max + index_y * getObstacle_map().info.width;
+
+
+
+//         if ( index_x_max < 0 || index_x_max >= getObstacle_map().info.width||
+//             index_y < 0 || index_y >= getObstacle_map().info.height)
+//             continue;
+//         if (getObstacle_map().data[index_1]>0)
+//             return true;
+//   }
+// }
+            // math::AABox2d box({rect.center_x()-0.2, rect.center_y()-0.2}, {rect.center_x()+0.2, rect.center_y()+0.2});
+
+            //     visualization::PlotPolygon(math::Polygon2d(math::Box2d(box)), 0.02, visualization::Color::Grey, 0,
+            //                    "Front Corridor1");
+
+  
+
+  //  for (auto &obstacle: obstacles_) {
+  //   if (obstacle.HasOverlap(rect)) {
+  //     return true;
+  //   }
+  // }
 
 
   return false;

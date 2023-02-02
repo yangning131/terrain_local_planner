@@ -3,13 +3,13 @@
 <!-- <arg name="use_sim_time" default="false  0.8"/> -->
 <node name="pure_pursuit_1" pkg="pure_pursuit" type="pure_pursuit" respawn="false" output="screen">
 
-
-    <remap from="/path_segment" to="/planning/planning/execute_path" />
+    <remap from="/path_segment" to="/planning/planning/execute_path_op" />
+    <!-- <remap from="/path_segment" to="/planning/planning/execute_path" /> -->
     <!-- <remap from="/path_segment" to="/expath" /> -->
      <remap from="/odometry" to="/odometry/filtered" />
   
     <param name = "wheelbase" value = "0.8"/>
-    <param name = "lookahead_distance" value = "0.45"/>
+    <param name = "lookahead_distance" value = "0.9"/>
     <param name = "linear_velocity" value = "0.9"/>
 
 

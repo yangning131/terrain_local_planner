@@ -38,6 +38,11 @@ public:
 
   bool Plan(const StartState &state, DiscretizedTrajectory &result);
 
+  float pointDistance(TrajectoryPoint p1, TrajectoryPoint p2)
+{
+    return sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
+}
+
 
 private:
   CartesianPlannerConfig config_;
@@ -46,5 +51,7 @@ private:
 
 
 };
+
+
 
 }
