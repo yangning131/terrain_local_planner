@@ -196,6 +196,7 @@ class PathPlanning : public ParamServer
         HybridAStar_construct(
             steering_angle, steering_angle_discrete_num, segment_length, segment_length_discrete_num, wheel_base,
             steering_penalty, reversing_penalty, steering_change_penalty, shot_distance ,72);
+
         hybrid_Init();
 
         // path_pub_ = nh.advertise<nav_msgs::Path>("searched_path", 1);
@@ -222,7 +223,7 @@ class PathPlanning : public ParamServer
         adjacency_width_grid = -1;
         adjacency_length_grid = -1;
 
-        pathUpdateTimer = nh.createTimer(ros::Duration(1.0), &PathPlanning::updatePath, this);
+        pathUpdateTimer = nh.createTimer(ros::Duration(0.4), &PathPlanning::updatePath, this);
         // pathPublishTimer = nh.createTimer(ros::Duration(0.05), &PathPlanning::publishPath, this);
 
     }
@@ -328,6 +329,30 @@ void hybrid_Init() {
             }
         }
     }
+}
+
+void Hybrid_Reset() {
+    if (state_node_map_) {
+        for (int i = 0; i < STATE_GRID_SIZE_X_; ++i) {
+            if (state_node_map_[i] == nullptr)
+                continue;
+
+            for (int j = 0; j < STATE_GRID_SIZE_Y_; ++j) {
+                if (state_node_map_[i][j] == nullptr)
+                    continue;
+
+                for (int k = 0; k < STATE_GRID_SIZE_PHI_; ++k) {
+                    if (state_node_map_[i][j][k] != nullptr) {
+                        delete state_node_map_[i][j][k];
+                        state_node_map_[i][j][k] = nullptr;
+                    }
+                }
+            }
+        }
+    }
+
+    path_length_ = 0.0;
+    terminal_node_ptr_ = nullptr;
 }
 
 inline Vec_3i State2Index(const Vect_3d &state) const {
@@ -2186,6 +2211,10 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
             }
             end=clock();
             double endtime=(double)(end-start)/CLOCKS_PER_SEC;
+            cout<<"Total time0:"<<endtime*1000<<"ms"<<endl;
+            Hybrid_Reset();
+            end=clock();
+            endtime=(double)(end-start)/CLOCKS_PER_SEC;
             cout<<"Total time:"<<endtime*1000<<"ms"<<endl;
             // //bilibli  hybrid
 
