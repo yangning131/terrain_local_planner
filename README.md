@@ -20,3 +20,7 @@ bug :rs曲线与搜索曲线接口处有过调 原因rs曲线本身有倒车  �
 5.新障碍物碰撞检测方法   已更改部分 碰撞检测方法有问题
 6.里程计及path更新      抹去走过的path
 7.cmd计算或者输出path
+
+8.hybrid steering_angle_discrete_num  更改增加扩展数量
+
+9.更改hybrid 初始化位置 优化速度

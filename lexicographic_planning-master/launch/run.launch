@@ -18,7 +18,7 @@
     
     <node pkg="$(arg project)" type="$(arg project)_pathPlanning"   name="$(arg project)_pathPlanning" output="screen" respawn="false" launch-prefix="xterm -e gdb -ex run --args" >
         <param name="planner/steering_angle" value="25.0"/>
-        <param name="planner/steering_angle_discrete_num" value="1"/>
+        <param name="planner/steering_angle_discrete_num" value="3"/>
         <param name="planner/wheel_base" value="1"/>
         <param name="planner/segment_length" value="1.6"/>
         <param name="planner/segment_length_discrete_num" value="8"/>

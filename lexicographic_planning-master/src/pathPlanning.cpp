@@ -184,7 +184,7 @@ class PathPlanning : public ParamServer
 
         /* Hybrid */
         double steering_angle = nh.param("planner/steering_angle", 30);
-        int steering_angle_discrete_num = nh.param("planner/steering_angle_discrete_num", 1);
+        int steering_angle_discrete_num = nh.param("planner/steering_angle_discrete_num", 3);
         double wheel_base = nh.param("planner/wheel_base", 1.0);
         double segment_length = nh.param("planner/segment_length", 1.6);
         int segment_length_discrete_num = nh.param("planner/segment_length_discrete_num", 8);
@@ -196,6 +196,7 @@ class PathPlanning : public ParamServer
         HybridAStar_construct(
             steering_angle, steering_angle_discrete_num, segment_length, segment_length_discrete_num, wheel_base,
             steering_penalty, reversing_penalty, steering_change_penalty, shot_distance ,72);
+        hybrid_Init();
 
         // path_pub_ = nh.advertise<nav_msgs::Path>("searched_path", 1);
 
@@ -221,9 +222,8 @@ class PathPlanning : public ParamServer
         adjacency_width_grid = -1;
         adjacency_length_grid = -1;
 
-        pathUpdateTimer = nh.createTimer(ros::Duration(3.0/1.0), &PathPlanning::updatePath, this);
+        pathUpdateTimer = nh.createTimer(ros::Duration(1.0), &PathPlanning::updatePath, this);
         // pathPublishTimer = nh.createTimer(ros::Duration(0.05), &PathPlanning::publishPath, this);
-
 
     }
 
@@ -285,35 +285,11 @@ class PathPlanning : public ParamServer
     ANGULAR_RESOLUTION_ = 360.0 / STATE_GRID_SIZE_PHI_ * M_PI / 180.0;
 }
 
-void hybrid_Init(double x_lower, double x_upper, double y_lower, double y_upper,
-                       double state_grid_resolution) {
+void hybrid_Init() {
     // SetVehicleShape(4.7, 0.3, 1.3);//长  宽  到后边距离
-
-    map_x_lower_ = x_lower;
-    map_x_upper_ = x_upper;
-    map_y_lower_ = y_lower;
-    map_y_upper_ = y_upper;
-    STATE_GRID_RESOLUTION_ = state_grid_resolution;
-    // MAP_GRID_RESOLUTION_ = map_grid_resolution;
-
-    // STATE_GRID_SIZE_X_ = std::floor((map_x_upper_ - map_x_lower_) / STATE_GRID_RESOLUTION_);
-    // STATE_GRID_SIZE_Y_ = std::floor((map_y_upper_ - map_y_lower_) / STATE_GRID_RESOLUTION_);
-
 
     STATE_GRID_SIZE_X_ = _local_map_grid_num;
     STATE_GRID_SIZE_Y_ = _local_map_grid_num;
-
-    // cout<<"STATE_GRID_SIZE_X_"<<STATE_GRID_SIZE_X_<<endl;
-    // cout<<"_local_map_grid_num"<<_local_map_grid_num<<endl;
-    // MAP_GRID_SIZE_X_ = std::floor((map_x_upper_ - map_x_lower_) / MAP_GRID_RESOLUTION_);
-    // MAP_GRID_SIZE_Y_ = std::floor((map_y_upper_ - map_y_lower_) / MAP_GRID_RESOLUTION_);
-
-    // if (map_data_) {
-    //     delete[] map_data_;
-    //     map_data_ = nullptr;
-    // }
-
-    // map_data_ = new uint8_t[MAP_GRID_SIZE_X_ * MAP_GRID_SIZE_Y_];
 
     if (state_node_map_) {
         for (int i = 0; i < STATE_GRID_SIZE_X_; ++i) {
@@ -527,11 +503,9 @@ void GetNeighborNodes(const StateNode::Ptr &curr_node_ptr,
     }
     else
     {   
-        std::cout<<"farward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;       
         if(use_backwardmodel)
         {
         // backward
-        std::cout<<"backward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
         has_obstacle = false;
         intermediate_state.clear();
         x = curr_node_ptr->state_.x();
@@ -681,10 +655,8 @@ bool isInRange(const Vect_3d& current_state, const Vect_3d& goal_state) {
 
   double dist=  (current_state.head(2) - goal_state.head(2)).norm() ;
 //   double dist= (dx * dx) + (dy * dy) ;
-   std::cout<<"dist"<<dist<<std::endl;
    
   double datatheata=std::abs(current_state.z()-goal_state.z());
-   std::cout<<"datatheata "<<datatheata<<"current_state "<<current_state.z()<<"goal_state "<<goal_state.z()<<std::endl;
   if(dist<6.0&&datatheata<3.0)//10ｄｅｇｒｅｅ
   return true;
   return false;
@@ -749,14 +721,15 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
                 }
                 path_length_ = path_length_ - segment_length_ + rs_length;
                 
-                // std::cout << "ComputeH use time(ms): " << compute_h_time << std::endl;
-                // std::cout << "check collision use time(ms): " << check_collision_use_time << std::endl;
-                // std::cout << "GetNeighborNodes use time(ms): " << neighbor_time << std::endl;
-                // std::cout << "average time of check collision(ms): "
-                //           << check_collision_use_time / num_check_collision
-                //           << std::endl;
-                // ROS_INFO("\033[1;32m --> Time in Hybrid A star is %f ms, path length: %f  \033[0m\n",
-                //          search_used_time.End(), path_length_);
+                std::cout << "ComputeH use time(ms): " << compute_h_time << std::endl;
+                std::cout << "check collision use time(ms): " << check_collision_use_time << std::endl;
+                std::cout << "GetNeighborNodes use time(ms): " << neighbor_time << std::endl;
+                std::cout << "average time of check collision(ms): "
+                          << check_collision_use_time / num_check_collision
+                          << std::endl;
+                std::cout << "num_check_collision(ms): " << num_check_collision << std::endl;
+                ROS_INFO("\033[1;32m --> Time in Hybrid A star is %f ms, path length: %f  \033[0m\n",
+                         search_used_time.End(), path_length_);
 
                 check_collision_use_time = 0.0;
                 num_check_collision = 0.0;
@@ -765,7 +738,7 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
         }
         if(!use_rspath)
         {
-            if((current_node_ptr->state_.head(2) - goal_node_ptr->state_.head(2)).norm() <= 0.5 && std::abs(current_node_ptr->state_[2]-goal_node_ptr->state_[2])<=0.3)
+            if((current_node_ptr->state_.head(2) - goal_node_ptr->state_.head(2)).norm() <= 0.8 && std::abs(current_node_ptr->state_[2]-goal_node_ptr->state_[2])<=0.6)
             {   
                 goal_node_ptr->parent_node_ = current_node_ptr;
                 terminal_node_ptr_ = goal_node_ptr;
@@ -929,8 +902,15 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
     {
         std::lock_guard<std::mutex> lock(mtx);
        
-       configurationSpace._mapResolution=_mapResolution;
+        configurationSpace._mapResolution=_mapResolution;
         occupancyMap2D = *mapMsg;
+
+        map_x_lower_ = occupancyMap2D.info.origin.position.x;
+        map_x_upper_ = _mapResolution*_local_map_grid_num;
+        map_y_lower_ = occupancyMap2D.info.origin.position.y;
+        map_y_upper_ =  _mapResolution*_local_map_grid_num;
+        STATE_GRID_RESOLUTION_ = _mapResolution;
+
         configurationSpace.updateGrid(occupancyMap2D);
         // nav_msgs::OccupancyGrid::Ptr map_grig=;
        // configurationSpace.updateGrid(mapMsg);//?????????????????????????????????
@@ -2126,7 +2106,7 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
         }
         end=clock();
         double endtime=(double)(end-start)/CLOCKS_PER_SEC;
-        cout<<"Total time:"<<endtime*1000<<"ms"<<endl;	
+        // cout<<"collision time:"<<endtime*1000<<"ms"<<endl;	
 
         if (needFlag == true)
             return true;
@@ -2140,25 +2120,17 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
 
         if (getRobotPosition() == false) return;
 
-
         if (needNewPath()&&receive_imagemap)
         {   
-
             // buildAdjacencyMatrix();
-
-            // connectAdjacencyMatrix();
-            
+            // connectAdjacencyMatrix();          
             // searchAdjacencyMatrix();
-            // plan();
-            
-            //path.poses[next].pose.position.x
-
+            // plan();            
 
             ///bilihyrid
-            hybrid_Init(occupancyMap2D.info.origin.position.x, _mapResolution*_local_map_grid_num,
-                                                  occupancyMap2D.info.origin.position.y, _mapResolution*_local_map_grid_num, _mapResolution);
-             openPlannerRollOut.run(transform, globalPathMessage, globalPath, searchedPath, remainingPath);
-            //  cout<<"remainingPath ："<<remainingPath.poses[0].pose.position.x;
+            clock_t start,end;
+            start=clock();
+            openPlannerRollOut.run(transform, globalPathMessage, globalPath, searchedPath, remainingPath);
             Vect_3d start_state = Vect_3d(
                 (double)robotPoint.x,
                 (double)robotPoint.y,
@@ -2196,8 +2168,6 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
                }
                else
                {
-               // std::cout<<"use remaingPath"<<std::endl;
-                // cout<<"remainingPath__ ："<<remainingPath.poses[0].pose.position.x<<endl;
                  goal_state = Vect_3d(
                 (double)remainingPath.poses[i].pose.position.x,
                 (double)remainingPath.poses[i].pose.position.y,
@@ -2205,27 +2175,24 @@ void tracePath(const Node3D* node, int i = 0 , std::vector<Node3D> path_node= st
                 );
                }
                
-            }   
-               //  std::cout<<"start: x "<<start_state(0)<<" y "<<start_state(1)<<" z "<<start_state(2)<<std::endl;
-               //  std::cout<<"goal: x "<<goal_state(0)<<" y "<<goal_state(1)<<" z "<<goal_state(2)<<std::endl;
-
-       
+            }        
 
             if (kinodynamic_Search(start_state, goal_state))
             {
                 ROS_INFO("re-plannig success!");
                 auto path = GetPath();
                 save_KinoPath(path);
-
                 Publish_imageshow(path);
             }
+            end=clock();
+            double endtime=(double)(end-start)/CLOCKS_PER_SEC;
+            cout<<"Total time:"<<endtime*1000<<"ms"<<endl;
             // //bilibli  hybrid
 
 
-            visualization();
+            // visualization();
         }
-       // visualization();
-
+        visualization();
         // publishPath();
     }
 };
