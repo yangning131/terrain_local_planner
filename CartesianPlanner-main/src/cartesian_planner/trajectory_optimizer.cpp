@@ -109,16 +109,16 @@ bool TrajectoryOptimizer::FormulateCorridorConstraints(States &states, Constrain
       return false;
     }
     constraints.front_bound[i] = {box.min_x(), box.max_x(), box.min_y(), box.max_y()};
-
-    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box)), 0.02, visualization::Color::Grey, i,
+    math::AABox2d box_ploy({box.min_x()-vehicle_.radius,box.min_y()-vehicle_.radius},{ box.max_x()+vehicle_.radius, box.max_y()+vehicle_.radius});
+    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy)), 0.02, visualization::Color::Grey, i,
                                "Front Corridor");
 
     if (!GenerateBox(time, states.xr[i], states.yr[i], vehicle_.radius, box)) {
       return false;
     }
     constraints.rear_bound[i] = {box.min_x(), box.max_x(), box.min_y(), box.max_y()};
-
-    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box)), 0.02, visualization::Color::Blue, i, "Rear Corridor");
+    math::AABox2d box_ploy1({box.min_x()-vehicle_.radius,box.min_y()-vehicle_.radius},{ box.max_x()+vehicle_.radius, box.max_y()+vehicle_.radius});
+    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy1)), 0.02, visualization::Color::Blue, i, "Rear Corridor");
   }
 
   visualization::Trigger();
@@ -163,7 +163,7 @@ bool TrajectoryOptimizer::GenerateBox(double time, double &x, double &y, double 
   int inc = 4;
   std::bitset<4> blocked;
   double incremental[4] = {0.0};
-  double step = radius * 0.2;
+  double step = radius * 0.1;//radius * 0.2
 
   do {
     int iter = inc / 4;
@@ -187,7 +187,7 @@ bool TrajectoryOptimizer::GenerateBox(double time, double &x, double &y, double 
   }
 
   result = {{x - incremental[0], y - incremental[2]},
-            {x + incremental[1], y + incremental[3]}};
+            {x + incremental[1], y + incremental[3]}};//此处把半径去了
 
   return true;
 }
