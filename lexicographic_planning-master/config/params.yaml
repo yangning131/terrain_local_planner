@@ -17,9 +17,9 @@ roboat_planning:
   # Alternative Path Params
   _samplingTipMargin: 0.1 # 1.0  0.5  延长距离  0.5 
   _samplingOutMargin: 0.1  # 1.0 平滑度
-  _pathResolution: 0.4 #0.1一条path中的re  0.2 11
+  _pathResolution: 0.2 #0.1一条path中的re  0.2 11
   _maxPathDistance: 15.0   #搜索长度
-  _rollOutDensity: 0.4 #每条path 的dis 0.2 11
+  _rollOutDensity: 0.2 #每条path 的dis 0.2 11
   _rollOutNumber: 30 #num  path
 
   _is_use_rspath: false

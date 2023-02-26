@@ -44,7 +44,7 @@ public:
     pathmap()
     {
 
-        subGlobalPath = nh.subscribe<nav_msgs::Path>("planning/server/path_blueprint_smooth", 5, &pathmap::pathHandler, this);
+        subGlobalPath = nh.subscribe<nav_msgs::Path>("expath222", 5, &pathmap::pathHandler, this);
 
         pubOccupancyMap  = nh.advertise<nav_msgs::OccupancyGrid> ("planning/pathmap_path", 1);
 

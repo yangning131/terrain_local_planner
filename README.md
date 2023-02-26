@@ -24,3 +24,5 @@ bug :rs曲线与搜索曲线接口处有过调 原因rs曲线本身有倒车  �
 8.hybrid steering_angle_discrete_num  更改增加扩展数量
 
 9.更改hybrid 初始化位置 优化速度  ;  释放 珊格数据结构
+
+10.重新做碰撞检测  定位低障碍物位置  用z值标记  优化约束住low ob

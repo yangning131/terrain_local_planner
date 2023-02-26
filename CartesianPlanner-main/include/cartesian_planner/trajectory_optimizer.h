@@ -40,7 +40,7 @@ private:
 
   void CalculateInitialGuess(States &states) const;
 
-  bool FormulateCorridorConstraints(States &states, Constraints &constraints);
+  bool FormulateCorridorConstraints(States &states, States &states_h, Constraints &constraints);
 
   bool GenerateBox(double time, double &x, double &y, double radius, AABox2d &result) const;
 

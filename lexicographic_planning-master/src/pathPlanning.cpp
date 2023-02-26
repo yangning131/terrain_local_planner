@@ -155,7 +155,7 @@ class PathPlanning : public ParamServer
  public:
         PathPlanning()
     {   
-        subGlobalPath = nh.subscribe<nav_msgs::Path>("planning/server/path_blueprint_smooth", 5, &PathPlanning::pathHandler, this);
+        subGlobalPath = nh.subscribe<nav_msgs::Path>("expath222", 5, &PathPlanning::pathHandler, this);
         subObstacleMap = nh.subscribe<nav_msgs::OccupancyGrid>("planning/obstacle/map_inflated", 5, &PathPlanning::mapHandler, this);
 
         subPathMap = nh.subscribe<nav_msgs::OccupancyGrid>("planning/pathmap_path", 5, &PathPlanning::path_mapHandler, this);
@@ -637,9 +637,29 @@ void save_KinoPath(const VectorVec3d &path) {
 
     nav_path.header.frame_id = "map";
     nav_path.header.stamp = ros::Time::now();
+    // executePath = nav_path;
+
+
+
+    getlowobposition(nav_path);
     executePath = nav_path;
 
-     path_pub_.publish(nav_path);
+    path_pub_.publish(nav_path);
+}
+
+void getlowobposition(nav_msgs::Path &nav_path)
+{
+    for (int i = 0; i < nav_path.poses.size()-4; ++i)
+        {
+            float x = nav_path.poses[i].pose.position.x;
+            float y = nav_path.poses[i].pose.position.y;
+            float yaw = tf::getYaw(nav_path.poses[i].pose.orientation);
+
+            if (findlowobpose_Byimage(x, y, yaw))// || isCloseCollision(x, y))
+            {
+                nav_path.poses[i].pose.position.z=0.2;
+            } 
+        }
 }
 
 void Publish_imageshow(const VectorVec3d &path) {
@@ -1045,6 +1065,36 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
         //      pubImage_robot.publish(out_z_image.toImageMsg());
         //   }
 
+
+    }
+
+    bool findlowobpose_Byimage(const float &x, const float &y ,const float &yaw)
+    {   
+
+        cv::Mat robot_thata ;
+        // cv::Mat ImageMap_ = ImageMap.clone() ;
+       
+        robot_thata = Chassis.descriptors[GetChassisdescriptorIndex(yaw)].image_collision;
+        // std::cout<<"yaw test: "<<(yaw*180/3.1415)<<std::endl;
+
+        int index_x = (int)round((x - occupancyMap2D.info.origin.position.x) / _mapResolution);
+        int index_y = (int)round((y - occupancyMap2D.info.origin.position.y) / _mapResolution);
+
+        if (index_x < ceil(robot_thata.cols/2) || index_x >= occupancyMap2D.info.width -floor(robot_thata.cols/2) ||
+            index_y < ceil(robot_thata.rows/2) || index_y >= occupancyMap2D.info.height- floor(robot_thata.rows/2))
+            return false;
+
+        cv::Mat imageROI = ImageMap(Rect(index_y -robot_thata.cols/2,index_x -robot_thata.rows/2 ,robot_thata.cols,robot_thata.rows));
+
+        double val = imageROI.dot(robot_thata);
+        
+       //  cout<<"ImagePathMapBound_____________"<<ImageMap.at<int>(10,10)<<endl;
+
+        if (val > 0) //0 200 255
+            return true;
+        else
+            return false;
+                
 
     }
 

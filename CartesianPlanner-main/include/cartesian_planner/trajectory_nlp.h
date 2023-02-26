@@ -22,7 +22,7 @@ namespace cartesian_planner {
 using namespace casadi;
 
 struct States {
-  std::vector<double> x, y, theta, v, phi, a, omega, jerk, xf, yf, xr, yr;
+  std::vector<double> x, y, z, theta, v, phi, a, omega, jerk, xf, yf, xr, yr;
 };
 
 struct Constraints {

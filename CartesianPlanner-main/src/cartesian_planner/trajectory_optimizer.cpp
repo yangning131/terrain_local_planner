@@ -29,18 +29,18 @@ bool TrajectoryOptimizer::OptimizeIteratively(const DiscretizedTrajectory &coars
   for (auto &pt: coarse.data()) {
     guess.x.push_back(pt.x);
     guess.y.push_back(pt.y);
+    guess.z.push_back(pt.z);
     guess.theta.push_back(pt.theta);
   }
-
   CalculateInitialGuess(guess);
-
+  States guess_save = guess;
   int iter = 0;
   double w_penalty = config_.opti_w_penalty0;
 
   Constraints iterative_constraints = constraints;
 
   while (iter < config_.opti_iter_max) {
-    FormulateCorridorConstraints(guess, iterative_constraints);
+    FormulateCorridorConstraints(guess, guess_save, iterative_constraints);
 
     double cur_infeasibility = nlp_.SolveIteratively(w_penalty, iterative_constraints, guess, coarse, guess);
     visualization::Plot(guess.x, guess.y, 0.1, visualization::Color::Green, iter, "Intermediate Trajectory");
@@ -88,14 +88,14 @@ void TrajectoryOptimizer::CalculateInitialGuess(States &states) const {
   }
 }
 
-bool TrajectoryOptimizer::FormulateCorridorConstraints(States &states, Constraints &constraints) {
+bool TrajectoryOptimizer::FormulateCorridorConstraints(States &states, States &states_h, Constraints &constraints) {
   constraints.front_bound.resize(config_.nfe);
   constraints.rear_bound.resize(config_.nfe);
   states.xf.resize(config_.nfe);
   states.yf.resize(config_.nfe);
   states.xr.resize(config_.nfe);
   states.yr.resize(config_.nfe);
-
+  float buffer = 0.1;
   double hi = config_.tf / (config_.nfe - 1);
 
   for (size_t i = 0; i < config_.nfe; i++) {
@@ -105,20 +105,42 @@ bool TrajectoryOptimizer::FormulateCorridorConstraints(States &states, Constrain
                                                                                                  states.theta[i]);
 
     math::AABox2d box;
-    if (!GenerateBox(time, states.xf[i], states.yf[i], vehicle_.radius, box)) {
-      return false;
-    }
-    constraints.front_bound[i] = {box.min_x(), box.max_x(), box.min_y(), box.max_y()};
-    math::AABox2d box_ploy({box.min_x()-vehicle_.radius,box.min_y()-vehicle_.radius},{ box.max_x()+vehicle_.radius, box.max_y()+vehicle_.radius});
-    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy)), 0.02, visualization::Color::Grey, i,
+    if(states_h.z[i]>0.18) //states.z[i]>0
+    {
+      constraints.front_bound[i] = {states.xf[i]-buffer, states.xf[i] +buffer, states.yf[i]-buffer, states.yf[i]+buffer};
+      math::AABox2d box_ploy({states.xf[i]-buffer-vehicle_.radius,states.yf[i]-buffer-vehicle_.radius},{ states.xf[i] +buffer+vehicle_.radius, states.yf[i]+buffer+vehicle_.radius});
+      visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy)), 0.02, visualization::Color::Grey, i,
                                "Front Corridor");
-
-    if (!GenerateBox(time, states.xr[i], states.yr[i], vehicle_.radius, box)) {
-      return false;
     }
+    else{
+
+          if (!GenerateBox(time, states.xf[i], states.yf[i], vehicle_.radius, box)) {
+            return false;
+          }
+      constraints.front_bound[i] = {box.min_x(), box.max_x(), box.min_y(), box.max_y()};
+      math::AABox2d box_ploy1({box.min_x()-vehicle_.radius,box.min_y()-vehicle_.radius},{ box.max_x()+vehicle_.radius, box.max_y()+vehicle_.radius});
+      visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy1)), 0.02, visualization::Color::Grey, i,
+                               "Front Corridor");
+    }
+    
+    if(states_h.z[i]>0.18)
+    {
+      constraints.rear_bound[i] = {states.xr[i]-buffer, states.xr[i] +buffer, states.yr[i]-buffer, states.yr[i]+buffer};
+      math::AABox2d box_ploy3({states.xr[i]-buffer-vehicle_.radius,states.yr[i]-buffer-vehicle_.radius},{ states.xr[i] +buffer+vehicle_.radius, states.yr[i]+buffer+vehicle_.radius});
+      visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy3)), 0.02, visualization::Color::Blue, i, "Rear Corridor");
+
+    }
+    else{
+          if (!GenerateBox(time, states.xr[i], states.yr[i], vehicle_.radius, box)) {
+          return false;
+          }
+   
     constraints.rear_bound[i] = {box.min_x(), box.max_x(), box.min_y(), box.max_y()};
-    math::AABox2d box_ploy1({box.min_x()-vehicle_.radius,box.min_y()-vehicle_.radius},{ box.max_x()+vehicle_.radius, box.max_y()+vehicle_.radius});
-    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy1)), 0.02, visualization::Color::Blue, i, "Rear Corridor");
+    math::AABox2d box_ploy4({box.min_x()-vehicle_.radius,box.min_y()-vehicle_.radius},{ box.max_x()+vehicle_.radius, box.max_y()+vehicle_.radius});
+    visualization::PlotPolygon(math::Polygon2d(math::Box2d(box_ploy4)), 0.02, visualization::Color::Blue, i, "Rear Corridor");
+
+    }
+
   }
 
   visualization::Trigger();
