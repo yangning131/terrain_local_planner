@@ -48,7 +48,7 @@ public:
     or_path_subscriber_ = nh_.subscribe("planning/planning/execute_path", 1, &CartesianPlannerNode::Pathcallback, this); //planning/planning/execute_path  planning/server/path_blueprint_smooth
     subObstacleMap_ = nh_.subscribe<nav_msgs::OccupancyGrid>("planning/obstacle/map_inflated", 5, &CartesianPlannerNode::mapHandler, this);
 
-    pathUpdateTimer = nh_.createTimer(ros::Duration(5), &CartesianPlannerNode::updatePath, this);
+    pathUpdateTimer = nh_.createTimer(ros::Duration(0.3), &CartesianPlannerNode::updatePath, this);
     path_pub_ = nh_.advertise<nav_msgs::Path>("planning/planning/execute_path_op", 1);
 
 

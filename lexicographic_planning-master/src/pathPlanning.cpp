@@ -20,7 +20,9 @@
 #include "rs_path.h"
 #include "type.h"
 
+#include <Eigen/Dense>
 
+#include <opencv2/core/eigen.hpp>
 
 using namespace cv;
 //using namespace VisualizeNS;
@@ -223,7 +225,7 @@ class PathPlanning : public ParamServer
         adjacency_width_grid = -1;
         adjacency_length_grid = -1;
 
-        pathUpdateTimer = nh.createTimer(ros::Duration(0.4), &PathPlanning::updatePath, this);
+        pathUpdateTimer = nh.createTimer(ros::Duration(0.3), &PathPlanning::updatePath, this);
         // pathPublishTimer = nh.createTimer(ros::Duration(0.05), &PathPlanning::publishPath, this);
 
     }
@@ -657,7 +659,7 @@ void getlowobposition(nav_msgs::Path &nav_path)
 
             if (findlowobpose_Byimage(x, y, yaw))// || isCloseCollision(x, y))
             {
-                nav_path.poses[i].pose.position.z=0.2;
+                nav_path.poses[i].pose.position.z=0.3;
             } 
         }
 }
@@ -1038,11 +1040,53 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
             return false;
 
         cv::Mat imageROI = ImageMap(Rect(index_y -robot_thata.cols/2,index_x -robot_thata.rows/2 ,robot_thata.cols,robot_thata.rows));
+        //////////////////////
+        // clock_t start_e,end_e;
+        // Eigen::MatrixXi eigen_R, eigen_A;
+        // //	robot_thata.convertTo(robot_thata, CV_32F);
+        // cv::cv2eigen(robot_thata, eigen_R);
+        // cv::cv2eigen(imageROI, eigen_A);
+
+        // start_e=clock();
+        // Eigen::MatrixXi RE = eigen_R * eigen_A;
+        // end_e=clock();
+        // double endtime_e=(double)(end_e-start_e)/CLOCKS_PER_SEC;
+        // std::cout<<"MAT CSOT TIME00:"<<endtime_e*1000<<"ms"<<std::endl;
+        //////////////////////
+       // clock_t start,end;
+       // start=clock();
 
         cv::Mat result_mat = imageROI.mul(robot_thata);
+
+      //  end=clock();
+       // double endtime=(double)(end-start)/CLOCKS_PER_SEC;
+      //  std::cout<<"MAT CSOT TIME11:"<<endtime*1000<<"ms"<<std::endl;
+        ///////////////////////////
+        // clock_t start_1,end_1;
+        // start_1=clock();
+        // for(int i=0 ;i < 480;i++)//300
+        // {
+        //     int test1 = (int)round((x - occupancyMap2D.info.origin.position.x) / _mapResolution);
+        //     int test2 = (int)round((y - occupancyMap2D.info.origin.position.y) / _mapResolution);
+        //     if (index_x < ceil(robot_thata.cols/2) || index_x >= occupancyMap2D.info.width -floor(robot_thata.cols/2) ||
+        //     index_y < ceil(robot_thata.rows/2) || index_y >= occupancyMap2D.info.height- floor(robot_thata.rows/2))
+        //     {
+        //         test2 = 1;
+        //     }
+        //     else{
+        //                 if (occupancyMap2D.data[20] == 100)
+        //                 {
+        //                     test2=3;
+        //                 }
+        //     }
+        // }
+
+        // end_1=clock();
+        // double endtime_1=(double)(end_1-start_1)/CLOCKS_PER_SEC;
+        // std::cout<<"MAT CSOT TIME22:"<<endtime_1*1000<<"ms"<<std::endl;
+        //////////////////////////
         double max_val = 0;
         cv::minMaxLoc(result_mat,NULL,&max_val,NULL,NULL);
-        
         check_collision_use_time += timer.End();
         num_check_collision++;
        //  cout<<"ImagePathMapBound_____________"<<ImageMap.at<int>(10,10)<<endl;
@@ -1086,15 +1130,26 @@ bool kinodynamic_Search(const  Vect_3d &start_state, const  Vect_3d &goal_state)
 
         cv::Mat imageROI = ImageMap(Rect(index_y -robot_thata.cols/2,index_x -robot_thata.rows/2 ,robot_thata.cols,robot_thata.rows));
 
-        double val = imageROI.dot(robot_thata);
+    //     double val = imageROI.dot(robot_thata);
         
-       //  cout<<"ImagePathMapBound_____________"<<ImageMap.at<int>(10,10)<<endl;
+    //    //  cout<<"ImagePathMapBound_____________"<<ImageMap.at<int>(10,10)<<endl;
 
-        if (val > 0) //0 200 255
+    //     if (val > 0) //0 200 255
+    //         return true;
+    //     else
+    //         return false;
+    
+
+        cv::Mat result_mat = imageROI.mul(robot_thata);
+        double max_val = 0;
+        cv::minMaxLoc(result_mat,NULL,&max_val,NULL,NULL);
+
+        //cout<<"ImagePathMapBound_____________"<<max_val<<endl;
+
+        if (max_val > 100 && max_val <=200) //0 200 255
             return true;
         else
             return false;
-                
 
     }
 

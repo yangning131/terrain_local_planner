@@ -11,6 +11,8 @@
 
 #include "cartesian_planner/cartesian_planner.h"
 #include "cartesian_planner/visualization/plot.h"
+#include <fstream>
+
 
 namespace cartesian_planner {
 
@@ -179,6 +181,13 @@ bool CartesianPlanner::Plan(const StartState &state, DiscretizedTrajectory &resu
   std::vector<double> opti_x, opti_y, opti_v;
   Trajectory result_data;
   double incremental_s = 0.0;
+
+    std::ofstream destFile("/home/ynp/gbplanner_ws/txt/out.txt",std::ios::out); //以文本模式打开out.txt备写  alpha,  theta, v, phi, a, omega, jerk,
+  if(!destFile) {
+      std::cout << "error opening destination file." << std::endl;
+      return 0;
+  }
+
   for(int i = 0; i < config_.nfe; i++) {
     TrajectoryPoint tp;
     incremental_s += i > 0 ? hypot(optimized.x[i] - optimized.x[i-1], optimized.y[i] - optimized.y[i-1]) : 0.0;
@@ -194,8 +203,13 @@ bool CartesianPlanner::Plan(const StartState &state, DiscretizedTrajectory &resu
     opti_y.push_back(tp.y);
     opti_v.push_back(tp.velocity);
 
+    destFile << 11 << " "<< optimized.v[i] << " "<< optimized.a[i] << " "<< optimized.jerk[i] << " "<< optimized.theta[i]<< " " <<optimized.omega[i]<< " "<< tp.kappa<< " "<< optimized.phi[i]<<std::endl;
+
     result_data.push_back(tp);
   }
+  
+   destFile.close();
+
 
   visualization::PlotTrajectory(opti_x, opti_y, opti_v, config_.vehicle.max_velocity, 0.1, visualization::Color::Black, 1, "Optimized Trajectory");
   visualization::Trigger();

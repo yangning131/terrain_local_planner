@@ -13,12 +13,12 @@
     <param name = "linear_velocity" value = "0.9"/>
 
 
-    <param name = "max_rotational_velocity" value = "1.5"/>
+    <param name = "max_rotational_velocity" value = "1.0"/>
     <param name = "position_tolerance" value = "0.2"/>
     <param name = "steering_angle_velocity" value = "100.0"/>
     <param name = "acceleration" value = "100.0"/>
     <param name = "jerk" value = "100.0"/>
-    <param name = "steering_angle_limit" value = "1.57"/>
+    <param name = "steering_angle_limit" value = "1.37"/>
     <!-- <param name = "map_frame_id" value = "map"/> -->
     <!-- <param name = "robot_frame_id" value = "base_link"/> -->
     <param name = "map_frame_id" value = "map"/>

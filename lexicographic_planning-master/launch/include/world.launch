@@ -2,7 +2,7 @@
   <arg name="use_sim_time" default="true" />
   <arg name="gui" default="true" />
   <arg name="headless" default="false" />
-  <arg name="world_name" default="$(find lexicographic_planning)/world/sldddop11.world"/>
+  <arg name="world_name" default="$(find jackal_velodyne)/worlds/tree.world"/>
   <!-- <arg name="world_name" default="$(find lexicographic_planning)/world/garage.world" /> -->
 
   <!-- Short-term hack to support the original front_laser:=true argument for spawning

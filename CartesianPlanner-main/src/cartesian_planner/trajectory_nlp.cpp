@@ -67,7 +67,7 @@ void TrajectoryNLP::BuildIterativeNLP() {
                                             g_yf_kin, g_xr_kin, g_yr_kin}));
 
   SX f_obj =
-    sumsqr(x - p_ref_x) + sumsqr(y - p_ref_y) + config_.opti_w_r_theta * sumsqr(theta - p_ref_theta) +
+    sumsqr(x - p_ref_x) + sumsqr(y - p_ref_y) + //config_.opti_w_r_theta * sumsqr(theta - p_ref_theta) +
     config_.opti_w_u * (sumsqr(jerk) + config_.opti_w_rw * sumsqr(omega)) +
     p_inf_w * infeasibility;
 
@@ -116,6 +116,11 @@ double TrajectoryNLP::SolveIteratively(double w_inf, const Constraints &constrai
   lb_a(end) = ub_a(end) = 0.0;
   lb_omega(end) = ub_omega(end) = 0.0;
   lb_jerk(end) = ub_jerk(end) = 0.0;
+
+  for (int i = 1; i < config_.nfe; i++) {
+    if(guess.z[i]>0.18) ub_v(i) = config_.vehicle.max_velocity * 2/3; //    ub_v(i) = config_.vehicle.max_velocity * 1/(guess.alpha[i]*10+1);
+  }
+
 
   lb_xf = lb_yf = lb_xr = lb_yr = -inf * identity;
   ub_xf = ub_yf = ub_xr = ub_yr = inf * identity;
